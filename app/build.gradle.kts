@@ -55,6 +55,7 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+    implementation (libs.androidx.core.ktx.v1120)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -65,7 +66,8 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-   kapt(libs.hilt.android.compiler)
+    kapt(libs.hilt.android.compiler)
+    implementation (libs.androidx.hilt.navigation.compose)
 
 
     // Coroutines
@@ -74,7 +76,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt ("androidx.room:room-compiler:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 
     // Retrofit and Moshi
     implementation(libs.retrofit)
