@@ -46,6 +46,12 @@ fun MainScreen(viewModel: ClipboardViewModel) {
             interactionSource = interactionSource
         )
 
+        // Проверка номера в буфере обмена при старте экрана
+        LaunchedEffect(Unit) {
+            viewModel.checkClipboardForPhoneNumber(context)
+        }
+
+        // Отслеживание фокуса
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
                 when (interaction) {
@@ -68,3 +74,4 @@ fun MainScreen(viewModel: ClipboardViewModel) {
         }
     }
 }
+

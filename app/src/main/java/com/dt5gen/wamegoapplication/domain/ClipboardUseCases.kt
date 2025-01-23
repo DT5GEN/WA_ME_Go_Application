@@ -1,5 +1,7 @@
 package com.dt5gen.wamegoapplication.domain
 
+import android.content.ClipboardManager
+import android.content.Context
 import com.dt5gen.wamegoapplication.data.ClipboardRepository
 import javax.inject.Inject
 
@@ -8,6 +10,17 @@ class ClipboardUseCase @Inject constructor(private val repository: ClipboardRepo
     fun getFormattedPhoneNumber(): String? {
         val rawNumber = repository.getClipboardText() ?: return null
         return formatPhoneNumber(rawNumber)
+    }
+
+    fun getClipboardPhoneNumber(context: Context): String? {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipboard.primaryClip
+
+        if (clipData != null && clipData.itemCount > 0) {
+            val text = clipData.getItemAt(0).text?.toString() ?: return null
+            return formatPhoneNumber(text) // Форматируем номер
+        }
+        return null
     }
 
     fun formatPhoneNumber(phone: String): String {

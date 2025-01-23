@@ -1,5 +1,6 @@
 package com.dt5gen.wamegoapplication.presentation
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -74,5 +75,11 @@ class ClipboardViewModel @Inject constructor(
 
     fun getWhatsAppUrl(): String {
         return "https://wa.me/${phoneNumber.replace("+", "")}"
+    }
+
+    fun checkClipboardForPhoneNumber(context: Context) {
+        clipboardUseCase.getClipboardPhoneNumber(context)?.let {
+            phoneNumber = it
+        }
     }
 }
