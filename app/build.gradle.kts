@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.dt5gen.wamegoapplication"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -54,7 +54,7 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
+    //implementation(libs.androidx.core.ktx)
     implementation (libs.androidx.core.ktx.v1120)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
