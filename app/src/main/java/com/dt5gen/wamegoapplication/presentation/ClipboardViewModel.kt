@@ -74,8 +74,10 @@ class ClipboardViewModel @Inject constructor(
     }
 
     fun getWhatsAppUrl(): String {
-        return "https://wa.me/${phoneNumber.replace("+", "")}"
+        val formattedNumber = "+${phoneNumber.replace("+", "")}" // Добавляем "+" только перед отправкой
+        return "https://wa.me/$formattedNumber"
     }
+
 
     fun checkClipboardForPhoneNumber(context: Context) {
         clipboardUseCase.getClipboardPhoneNumber(context)?.let {
