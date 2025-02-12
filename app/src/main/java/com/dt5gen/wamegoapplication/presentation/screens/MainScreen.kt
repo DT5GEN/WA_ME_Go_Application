@@ -24,7 +24,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.dt5gen.wamegoapplication.presentation.ClipboardViewModel
 
-
 @Composable
 fun MainScreen(viewModel: ClipboardViewModel) {
     val context = LocalContext.current
@@ -55,6 +54,16 @@ fun MainScreen(viewModel: ClipboardViewModel) {
         ) {
             Text(text = "Перейти в WhatsApp")
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 🔥 КНОПКА ДЛЯ ОБНОВЛЕНИЯ НОМЕРА 🔥
+        Button(
+            onClick = { viewModel.checkClipboardForPhoneNumber() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Обновить номер")
+        }
     }
 
     // Проверяем номер при возврате в приложение
@@ -64,5 +73,3 @@ fun MainScreen(viewModel: ClipboardViewModel) {
         }
     }
 }
-
-
