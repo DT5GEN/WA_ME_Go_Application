@@ -14,6 +14,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +29,7 @@ import com.dt5gen.wamegoapplication.presentation.ClipboardViewModel
 fun MainScreen(viewModel: ClipboardViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val phoneNumber = viewModel.phoneNumber.collectAsState().value
 
     Column(
         modifier = Modifier
@@ -36,7 +38,7 @@ fun MainScreen(viewModel: ClipboardViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = viewModel.phoneNumber.value,
+            value = phoneNumber,
             onValueChange = { viewModel.updatePhoneNumber(it) },
             label = { Text("Введите номер") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
@@ -57,7 +59,6 @@ fun MainScreen(viewModel: ClipboardViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🔥 КНОПКА ДЛЯ ОБНОВЛЕНИЯ НОМЕРА 🔥
         Button(
             onClick = { viewModel.checkClipboardForPhoneNumber() },
             modifier = Modifier.fillMaxWidth()
@@ -66,7 +67,7 @@ fun MainScreen(viewModel: ClipboardViewModel) {
         }
     }
 
-    // Проверяем номер при возврате в приложение
+    // ✅ Проверяем буфер обмена при возврате в приложение
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.checkClipboardForPhoneNumber()
