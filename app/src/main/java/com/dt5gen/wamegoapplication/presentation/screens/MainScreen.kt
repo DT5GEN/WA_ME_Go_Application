@@ -2,12 +2,16 @@ package com.dt5gen.wamegoapplication.presentation.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -31,46 +35,67 @@ fun MainScreen(viewModel: ClipboardViewModel) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val phoneNumber = viewModel.phoneNumber.collectAsState().value
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(start = 16.dp, end = 16.dp)
     ) {
-        OutlinedTextField(
-            value = phoneNumber,
-            onValueChange = { viewModel.updatePhoneNumber(it) },
-            label = { Text("Введите номер") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.getWhatsAppUrl()))
-                context.startActivity(intent)
-            },
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Перейти в WhatsApp")
-        }
+            OutlinedTextField(
+                value = phoneNumber,
+                onValueChange = { newValue ->
+                    if (newValue.length <= 16 && newValue.all { it.isDigit() || it == '+' }) {
+                        viewModel.updatePhoneNumber(newValue)
+                    }
+                },
+                label = { Text("Введите номер") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { viewModel.checkClipboardForPhoneNumber() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Обновить номер")
+            // Оставляем место для истории номеров (будущее обновление)
+            Spacer(modifier = Modifier.weight(1f))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp), // ✅ Отступ от нижнего края
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.getWhatsAppUrl()))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Перейти в WhatsApp")
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = { viewModel.checkClipboardForPhoneNumber() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Обновить номер")
+                }
+            }
         }
     }
 
-    // ✅ Проверяем буфер обмена при возврате в приложение
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.checkClipboardForPhoneNumber()
         }
     }
 }
+
+

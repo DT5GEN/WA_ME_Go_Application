@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     MainScreen(viewModel)
                 }
             }
-        }
+        }  // 8 (213) 444-11-33
     }
 
     override fun onResume() {
