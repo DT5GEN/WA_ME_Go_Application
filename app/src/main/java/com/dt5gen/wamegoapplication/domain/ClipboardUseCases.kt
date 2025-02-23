@@ -18,10 +18,19 @@ class ClipboardUseCase @Inject constructor(private val repository: ClipboardRepo
 
         if (clipData != null && clipData.itemCount > 0) {
             val text = clipData.getItemAt(0).text?.toString() ?: return null
-            return formatPhoneNumber(text) // Форматируем номер
+
+            val filteredNumber = formatPhoneNumber(text)
+
+            // ✅ Пропускаем данные, если они не соответствуют номеру телефона
+            return if (filteredNumber.length in 10..16 && filteredNumber.startsWith("+")) {
+                filteredNumber
+            } else {
+                null
+            }
         }
         return null
     }
+
 
 
     fun formatPhoneNumber(input: String): String {
