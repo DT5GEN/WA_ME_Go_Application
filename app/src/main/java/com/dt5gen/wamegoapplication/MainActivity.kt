@@ -10,20 +10,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.dt5gen.wamegoapplication.presentation.ClipboardViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dt5gen.wamegoapplication.presentation.screens.MainScreen
+import com.dt5gen.wamegoapplication.presentation.ClipboardViewModel
+import com.dt5gen.wamegoapplication.presentation.viewmodel.HistoryViewModel
 import com.dt5gen.wamegoapplication.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private lateinit var clipboardViewModel: ClipboardViewModel // ✅ Теперь создаём один раз
+    private lateinit var historyViewModel: HistoryViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        clipboardViewModel = ViewModelProvider(this)[ClipboardViewModel::class.java] // ✅ Создаём один раз
+        historyViewModel = ViewModelProvider(this)[HistoryViewModel::class.java]
 
         setContent {
             AppTheme {
@@ -31,21 +38,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val viewModel: ClipboardViewModel = hiltViewModel()
-                    MainScreen(viewModel)
+                    MainScreen(clipboardViewModel, historyViewModel) // ✅ Передаём ViewModel в экран
                 }
             }
-        }  // 8 (213) 444-11-33
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        val viewModel: ClipboardViewModel = ViewModelProvider(this)[ClipboardViewModel::class.java]
-
-        viewModel.updatePhoneNumber("")  // ✅ Сброс перед обновлением
+        clipboardViewModel.updatePhoneNumber("")  // ✅ Сброс перед обновлением
         Handler(Looper.getMainLooper()).postDelayed({
-            viewModel.checkClipboardForPhoneNumber()
+            clipboardViewModel.checkClipboardForPhoneNumber()
         }, 100)  // ✅ Принудительная проверка через 100 мс
     }
 }
-

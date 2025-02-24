@@ -2,6 +2,7 @@ package com.dt5gen.wamegoapplication.presentation.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,12 +33,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.dt5gen.wamegoapplication.presentation.ClipboardViewModel
+import com.dt5gen.wamegoapplication.presentation.viewmodel.HistoryViewModel
+import java.util.Date
 
 @Composable
-fun MainScreen(viewModel: ClipboardViewModel) {
+fun MainScreen(viewModel: ClipboardViewModel, historyViewModel: HistoryViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val phoneNumber = viewModel.phoneNumber.collectAsState().value
+    val history = historyViewModel.history.collectAsState().value
 
     Box(
         modifier = Modifier
@@ -60,19 +68,37 @@ fun MainScreen(viewModel: ClipboardViewModel) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Оставляем место для истории номеров (будущее обновление)
-            Spacer(modifier = Modifier.weight(1f))
+            LazyColumn(
+                modifier = Modifier.weight(1f)
+            ) {
+                items(history) { item ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/${item.phoneNumber}"))
+                                context.startActivity(intent)
+                                historyViewModel.addNumber(item.phoneNumber) // ✅ Поднимаем номер в историю
+                            }
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(text = item.phoneNumber, style = MaterialTheme.typography.bodyLarge)
+                            Text(text = "Последний переход: ${Date(item.lastUsed)}", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp), // ✅ Отступ от нижнего края
+                modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.getWhatsAppUrl()))
                         context.startActivity(intent)
+                        historyViewModel.addNumber(phoneNumber)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -90,12 +116,17 @@ fun MainScreen(viewModel: ClipboardViewModel) {
             }
         }
     }
-
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.checkClipboardForPhoneNumber()
-        }
-    }
 }
 
 
+
+
+
+
+/////LaunchedEffect(lifecycleOwner) {
+//    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+//        viewModel.checkClipboardForPhoneNumber()
+//    }
+//}
+
+//
